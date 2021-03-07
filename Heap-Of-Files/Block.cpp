@@ -156,7 +156,7 @@ Student* Block::FindStudent(int index)
 	//Show info
 	if (_block.size() > 0)
 	{
-		for (int i = 0; i < _block.size(); i++)
+		for (int i = 0; i < 5; i++)
 		{
 			if (_block[i].GetIndex() == index)
 			{
@@ -165,10 +165,6 @@ Student* Block::FindStudent(int index)
 			if (i == 4 && nextBlock != nullptr)
 			{
 				nextBlock->FindStudent(index);
-			}
-			else
-			{
-				return nullptr;
 			}
 		}
 	}
