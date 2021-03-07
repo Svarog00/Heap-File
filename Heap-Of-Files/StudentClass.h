@@ -20,4 +20,6 @@ public:
 	void SetThirdName(std::string newName);
 	void SetIndex(int newIndex);
 	void SetGroupIndex(int newIndex);
+
+	int GetIndex();
 };

@@ -6,7 +6,7 @@ class Block
 {
 private:
 	std::vector<Student> _block;
-	int curNum;
+	Block* nextBlock;
 
 public:
 	Block();
@@ -14,5 +14,7 @@ public:
 	void AddStudent();
 	void ChangeStudent(int index);
 	void DeleteStudent(int index);
-	void FindStudent(int index);
+	void ShowStudent(int index);
+	void ShowBlock();
+	Student* FindStudent(int index);
 };

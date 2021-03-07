@@ -28,6 +28,7 @@ void Student::GetInfo()
 		<< "Second name: " << this->secondName << std::endl
 		<< "Patronymic: " << this->thirdName << std::endl
 		<< "Index of the group: " << this->groupIndex << std::endl;
+	std::cout << "\n==============================================\n";
 }
 
 void Student::SetName(std::string newName)
@@ -53,4 +54,9 @@ void Student::SetIndex(int newIndex)
 void Student::SetGroupIndex(int newIndex)
 {
 	this->groupIndex = newIndex;
+}
+
+int Student::GetIndex()
+{
+	return index;
 }

@@ -17,7 +17,7 @@ inline void ShowMenu();
 
 int main()
 {
-    Block block;
+    Block* blockEntry = new Block();
     char key;
     int tmpKey;
     while (true)
@@ -27,29 +27,39 @@ int main()
         switch (key)
         {
         case '1':
-            block.AddStudent();
+            blockEntry->AddStudent();
             break;
         case '2':
+            std::cout << "What index?\n";
             std::cin >> tmpKey;
-            block.ChangeStudent(tmpKey);
+            blockEntry->ChangeStudent(tmpKey);
             break;
         case '3':
+            std::cout << "What index?\n";
             std::cin >> tmpKey;
-            block.DeleteStudent(tmpKey);
+            blockEntry->DeleteStudent(tmpKey);
             break;
         case '4':
+            std::cout << "What index?\n";
             std::cin >> tmpKey;
-            block.FindStudent(tmpKey);
+            blockEntry->ShowStudent(tmpKey);
             break;
-
+        case '5':
+            blockEntry->ShowBlock();
+            break;
+        default:
+            std::cout << "Wrong command!" << std::endl;
+            system("cls");
+            break;
         }
     }
 }
 
 inline void ShowMenu()
 {
-    std::cout << "1 - Add new student" << std::endl
+    std::cout << "\n1 - Add new student" << std::endl
         << "2 - Edit student" << std::endl
         << "3 - Delete student" << std::endl
-        << "4 - Find student" << std::endl;
+        << "4 - Find student" << std::endl
+        << "5 - Show all of the students" << std::endl;
 }
