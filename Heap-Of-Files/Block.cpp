@@ -31,6 +31,14 @@ void Block::AddStudent()
 		//Enter data of a student
 		std::cout << "Index: ";
 		std::cin >> index;
+		Student* tmp = CheckIndex(index);
+		while (tmp != nullptr)
+		{
+			std::cout << "This index is occupied. Enter another index.\n";
+			std::cin >> index;
+			tmp = CheckIndex(index);
+		}
+
 		std::cout << "\nSecond name: ";
 		std::cin >> secondName;
 		std::cout << "\nName: ";
@@ -107,7 +115,7 @@ void Block::DeleteStudent(int index)
 	//erase it from vector
 	if (_block.size() > 0)
 	{
-		for (int i = 0; i < _block.size(); i++)
+		for (size_t i = 0; i < _block.size(); i++)
 		{
 			if (_block[i].GetIndex() == index)
 			{
@@ -118,7 +126,7 @@ void Block::DeleteStudent(int index)
 			{
 				nextBlock->DeleteStudent(index);
 			}
-			else
+			else if(i == 4 && nextBlock == nullptr)
 			{
 				std::cout << "There is no such student\n";
 			}
@@ -139,7 +147,7 @@ void Block::ShowBlock()
 {
 	if (_block.size() > 0)
 	{
-		for (int i = 0; i < _block.size(); i++)
+		for (size_t i = 0; i < _block.size(); i++)
 		{
 			_block[i].GetInfo();
 			if (i == 4 && nextBlock != nullptr)
@@ -150,13 +158,18 @@ void Block::ShowBlock()
 	}
 }
 
+Student* Block::CheckIndex(int index)
+{
+	return FindStudent(index);
+}
+
 Student* Block::FindStudent(int index)
 {
 	//Find the index of the student in the vector 
 	//Show info
 	if (_block.size() > 0)
 	{
-		for (int i = 0; i < 5; i++)
+		for (size_t i = 0; i < _block.size(); i++)
 		{
 			if (_block[i].GetIndex() == index)
 			{
@@ -170,3 +183,4 @@ Student* Block::FindStudent(int index)
 	}
 	return nullptr;
 }
+

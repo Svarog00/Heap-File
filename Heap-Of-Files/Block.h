@@ -16,5 +16,6 @@ public:
 	void DeleteStudent(int index);
 	void ShowStudent(int index);
 	void ShowBlock();
+	Student* CheckIndex(int index);
 	Student* FindStudent(int index);
 };
