@@ -158,6 +158,90 @@ void Block::ShowBlock()
 	}
 }
 
+void Block::LoadInFile()
+{
+	std::ofstream outf("Block.bin", std::ios::binary);
+	if (outf)
+	{
+		for (auto student : _block)
+		{
+			outf << student.GetIndex() << " " << student.GetSecondName() << " " << student.GetName() << " " << student.GetThirdName() << " " << student.GetGroupIndex() << std::endl;
+		}
+		if(nextBlock != nullptr)
+			nextBlock->LoadInFile(outf);
+	}
+	else std::cout << "Couldn't open file for writing!\n";
+	std::cout << "Block has been loaded in file!\n";
+	outf.close();
+}
+
+void Block::LoadInFile(std::ofstream& ofstream)
+{
+	if (ofstream)
+	{
+		for (auto student : _block)
+		{
+			ofstream << student.GetIndex();
+			ofstream << student.GetSecondName();
+			ofstream << student.GetName();
+			ofstream << student.GetThirdName();
+			ofstream << student.GetGroupIndex();
+		}
+		if (nextBlock != nullptr)
+			nextBlock->LoadInFile(ofstream);
+	}
+}
+
+void Block::LoadFromFile()
+{
+	std::ifstream ifs("Block.bin");
+	if (ifs)
+	{
+		int tmpIndex, tmpGroupIndex;
+		std::string tmpName, tmpSecondName, tmpThirdName;
+		while (ifs >> tmpIndex >> tmpSecondName >> tmpName >> tmpThirdName >> tmpGroupIndex)
+		{
+			_block.push_back(Student(tmpIndex, tmpName, tmpSecondName, tmpThirdName, tmpGroupIndex));
+			if (this->_block.size() == 5 && nextBlock != nullptr)
+			{
+				nextBlock->LoadFromFile(ifs);
+				break;
+			}
+			else if (this->_block.size() == 5 && nextBlock == nullptr)
+			{
+				nextBlock = new Block();
+				nextBlock->LoadFromFile(ifs);
+				break;
+			}
+		}
+	}
+	else std::cout << "Couldn't open file for writing!\n";
+}
+
+void Block::LoadFromFile(std::ifstream& ifstream)
+{
+	if (ifstream)
+	{
+		int tmpIndex, tmpGroupIndex;
+		std::string tmpName, tmpSecondName, tmpThirdName;
+		while (ifstream >> tmpIndex >> tmpSecondName >> tmpName >> tmpThirdName >> tmpGroupIndex)
+		{
+			_block.push_back(Student(tmpIndex, tmpName, tmpSecondName, tmpThirdName, tmpGroupIndex));
+			if (this->_block.size() == 5 && nextBlock != nullptr)
+			{
+				nextBlock->LoadFromFile(ifstream);
+				break;
+			}
+			else if (this->_block.size() == 5 && nextBlock == nullptr)
+			{
+				nextBlock = new Block();
+				nextBlock->LoadFromFile(ifstream);
+				break;
+			}
+		}
+	}
+}
+
 Student* Block::CheckIndex(int index)
 {
 	return FindStudent(index);

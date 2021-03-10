@@ -22,4 +22,8 @@ public:
 	void SetGroupIndex(int newIndex);
 
 	int GetIndex();
+	std::string GetSecondName();
+	std::string GetName();
+	std::string GetThirdName();
+	int GetGroupIndex();
 };

@@ -30,7 +30,7 @@ void Student::GetInfo()
 		<< "Index of the group: " << this->groupIndex << std::endl;
 	std::cout << "\n==============================================\n";
 }
-
+//Setters
 void Student::SetName(std::string newName)
 {
 	this->name = newName;
@@ -55,8 +55,28 @@ void Student::SetGroupIndex(int newIndex)
 {
 	this->groupIndex = newIndex;
 }
-
+//Getters
 int Student::GetIndex()
 {
 	return index;
+}
+
+std::string Student::GetSecondName()
+{
+	return secondName;
+}
+
+std::string Student::GetName()
+{
+	return name;
+}
+
+std::string Student::GetThirdName()
+{
+	return thirdName;
+}
+
+int Student::GetGroupIndex()
+{
+	return groupIndex;
 }

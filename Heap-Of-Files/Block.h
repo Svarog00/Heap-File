@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <fstream>
 #include "StudentClass.h"
 
 class Block
@@ -16,6 +17,10 @@ public:
 	void DeleteStudent(int index);
 	void ShowStudent(int index);
 	void ShowBlock();
+	void LoadInFile();
+	void LoadInFile(std::ofstream& ofstream);
+	void LoadFromFile();
+	void LoadFromFile(std::ifstream& ifstream);
 	Student* CheckIndex(int index);
 	Student* FindStudent(int index);
 };
