@@ -181,11 +181,7 @@ void Block::LoadInFile(std::ofstream& ofstream)
 	{
 		for (auto student : _block)
 		{
-			ofstream << student.GetIndex();
-			ofstream << student.GetSecondName();
-			ofstream << student.GetName();
-			ofstream << student.GetThirdName();
-			ofstream << student.GetGroupIndex();
+			ofstream << student.GetIndex() << " " << student.GetSecondName() << " " << student.GetName() << " " << student.GetThirdName() << " " << student.GetGroupIndex() << std::endl;
 		}
 		if (nextBlock != nullptr)
 			nextBlock->LoadInFile(ofstream);
