@@ -257,7 +257,7 @@ Student* Block::FindStudent(int index)
 			}
 			if (i == 4 && nextBlock != nullptr)
 			{
-				nextBlock->FindStudent(index);
+				return nextBlock->FindStudent(index);
 			}
 		}
 	}
