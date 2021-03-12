@@ -5,6 +5,7 @@
 Block::Block()
 {
 	nextBlock = nullptr;
+	LoadFromFile();
 }
 
 void Block::AddStudent()
@@ -49,6 +50,7 @@ void Block::AddStudent()
 		std::cin >> groupIndex;
 
 		_block.push_back(Student(index, name, secondName, thirdName, groupIndex));
+		LoadInFile();
 	}
 }
 
@@ -76,6 +78,7 @@ void Block::ChangeStudent(int index)
 			std::cout << "New name: \n";
 			std::cin >> newName;
 			student->SetName(newName);
+			LoadInFile();
 			break;
 		}
 		case 2:
@@ -84,6 +87,7 @@ void Block::ChangeStudent(int index)
 			std::cout << "New second name: \n";
 			std::cin >> newName;
 			student->SetSecondName(newName);
+			LoadInFile();
 			break;
 		}
 		case 3:
@@ -92,6 +96,7 @@ void Block::ChangeStudent(int index)
 			std::cout << "New third name: \n";
 			std::cin >> newName;
 			student->SetThirdName(newName);
+			LoadInFile();
 			break;
 		}
 		case 4:
@@ -100,6 +105,7 @@ void Block::ChangeStudent(int index)
 			std::cout << "New group index: \n";
 			std::cin >> newGroupIndex;
 			student->SetGroupIndex(newGroupIndex);
+			LoadInFile();
 			break;
 		}
 		default:
@@ -131,6 +137,7 @@ void Block::DeleteStudent(int index)
 				std::cout << "There is no such student\n";
 			}
 		}
+		LoadInFile();
 	}
 }
 
@@ -169,9 +176,9 @@ void Block::LoadInFile()
 		}
 		if(nextBlock != nullptr)
 			nextBlock->LoadInFile(outf);
+		std::cout << "Block has been loaded in file!\n";
 	}
 	else std::cout << "Couldn't open file for writing!\n";
-	std::cout << "Block has been loaded in file!\n";
 	outf.close();
 }
 
