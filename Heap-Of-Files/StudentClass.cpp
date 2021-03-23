@@ -8,7 +8,7 @@ Student::Student()
 	this->secondName = "Undefined";
 	this->thirdName = "Undefined";
 	this->groupIndex = 0;
-	std::cout << "New student added\n";
+	std::cout << "New student slot reserved\n";
 }
 
 Student::Student(int index, std::string name, std::string secondName, std::string thirdName, int groupIndex)

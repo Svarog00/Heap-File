@@ -2,10 +2,19 @@
 #include <iostream>
 #include "Block.h"
 
-Block::Block()
+int Block::Count = 0;
+Block* Block::EntryBlock = nullptr;
+
+Block::Block(bool init)
 {
 	nextBlock = nullptr;
-	LoadFromFile();
+	_num = Count;
+	Count++;
+	if (init)
+	{
+		LoadFromFile();
+		EntryBlock = this;
+	}
 }
 
 void Block::AddStudent()
@@ -16,7 +25,7 @@ void Block::AddStudent()
 			nextBlock->AddStudent();
 		else
 		{
-			nextBlock = new Block();
+			nextBlock = new Block(false);
 			nextBlock->AddStudent();
 			std::cout << "--------------------------Added new block\n";
 		}
@@ -169,14 +178,14 @@ void Block::ShowBlock()
 void Block::LoadInFile()
 {
 	std::ofstream outf("Block.bin", std::ios::binary);
+	outf.seekp(sizeof(_block) * _num, std::ios::beg);
 	if (outf)
 	{
 		for (auto student : _block)
 		{
 			outf << student.GetIndex() << " " << student.GetSecondName() << " " << student.GetName() << " " << student.GetThirdName() << " " << student.GetGroupIndex() << std::endl;
 		}
-		if(nextBlock != nullptr)
-			nextBlock->LoadInFile(outf);
+		//if(nextBlock != nullptr) nextBlock->LoadInFile(outf);
 		std::cout << "Block has been loaded in file!\n";
 	}
 	else std::cout << "Couldn't open file for writing!\n";
@@ -248,7 +257,7 @@ void Block::LoadFromFile(std::ifstream& ifstream)
 
 Student* Block::CheckIndex(int index)
 {
-	return FindStudent(index);
+	return EntryBlock->FindStudent(index);
 }
 
 Student* Block::FindStudent(int index)
