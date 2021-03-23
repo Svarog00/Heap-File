@@ -47,12 +47,6 @@ int main()
         case '5':
             blockEntry->ShowBlock();
             break;
-        case '6':
-            blockEntry->LoadInFile();
-            break;
-        case '7':
-            blockEntry->LoadFromFile();
-            break;
         default:
             std::cout << "Wrong command!" << std::endl;
             system("cls");
@@ -67,7 +61,5 @@ inline void ShowMenu()
         << "2 - Edit student" << std::endl
         << "3 - Delete student" << std::endl
         << "4 - Find student" << std::endl
-        << "5 - Show all of the students" << std::endl
-        << "6 - Load block in file" << std::endl
-        << "7 - Load block from file" << std::endl;
+        << "5 - Show all of the students" << std::endl;
 }
