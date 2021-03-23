@@ -136,6 +136,7 @@ void Block::DeleteStudent(int index)
 
 void Block::ShowStudent(int index)
 {
+	//Find student by index and show info
 	Student* student = FindStudent(index);
 	if (student == nullptr)
 		std::cout << "There is no such student\n";
@@ -245,8 +246,8 @@ Student* Block::CheckIndex(int index)
 
 Student* Block::FindStudent(int index)
 {
-	//Find the index of the student in the vector 
-	//Show info
+	//Find the student by index in the vector 
+	//Return pointer on the student
 	if (_block.size() > 0)
 	{
 		for (size_t i = 0; i < _block.size(); i++)
