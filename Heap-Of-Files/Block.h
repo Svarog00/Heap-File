@@ -8,8 +8,6 @@ class Block
 private:
 	std::vector<Student> _block;
 	Block* nextBlock;
-	int _num;
-	static int Count;
 	static Block* EntryBlock;
 
 public:

@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <iostream>
 
 class Student
 {
@@ -26,4 +27,7 @@ public:
 	std::string GetName();
 	std::string GetThirdName();
 	int GetGroupIndex();
+
+	friend std::ostream& operator<<(std::ostream& os, const Student& stud);
+	friend std::istream& operator>>(std::istream& is, Student& stud);
 };

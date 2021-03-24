@@ -80,3 +80,15 @@ int Student::GetGroupIndex()
 {
 	return groupIndex;
 }
+
+std::ostream& operator<<(std::ostream& os, const Student& stud)
+{
+	os << stud.index << ' ' << stud.secondName << ' ' << stud.name << ' ' << stud.thirdName << ' ' << stud.groupIndex << ' ';
+	return os;
+}
+
+std::istream& operator>>(std::istream& is, Student& stud)
+{
+	is >> stud.index >> stud.secondName >> stud.name >> stud.thirdName >> stud.groupIndex;
+	return is;
+}

@@ -2,14 +2,11 @@
 #include <iostream>
 #include "Block.h"
 
-int Block::Count = 0;
 Block* Block::EntryBlock = nullptr;
 
 Block::Block(bool init)
 {
 	nextBlock = nullptr;
-	_num = Count;
-	Count++;
 	if (init)
 	{
 		LoadFromFile();
@@ -26,8 +23,8 @@ void Block::AddStudent()
 		else
 		{
 			nextBlock = new Block(false);
-			nextBlock->AddStudent();
 			std::cout << "--------------------------Added new block\n";
+			nextBlock->AddStudent();
 		}
 	}
 	else
@@ -178,12 +175,12 @@ void Block::ShowBlock()
 void Block::LoadInFile()
 {
 	std::ofstream outf("Block.bin", std::ios::binary);
-	outf.seekp(sizeof(_block) * _num, std::ios::beg);
 	if (outf)
 	{
 		for (auto student : _block)
 		{
-			outf << student.GetIndex() << " " << student.GetSecondName() << " " << student.GetName() << " " << student.GetThirdName() << " " << student.GetGroupIndex() << std::endl;
+			outf << student;
+			outf << " ";
 		}
 		//if(nextBlock != nullptr) nextBlock->LoadInFile(outf);
 		std::cout << "Block has been loaded in file!\n";
@@ -212,9 +209,15 @@ void Block::LoadFromFile()
 	{
 		int tmpIndex, tmpGroupIndex;
 		std::string tmpName, tmpSecondName, tmpThirdName;
-		while (ifs >> tmpIndex >> tmpSecondName >> tmpName >> tmpThirdName >> tmpGroupIndex)
+		while (!ifs.eof())
 		{
-			_block.push_back(Student(tmpIndex, tmpName, tmpSecondName, tmpThirdName, tmpGroupIndex));
+			Student tmp;
+			ifs >> tmp;
+			if (ifs.eof())
+			{
+				break;
+			}
+			_block.push_back(tmp);
 			if (this->_block.size() == 5 && nextBlock != nullptr)
 			{
 				nextBlock->LoadFromFile(ifs);
@@ -237,9 +240,10 @@ void Block::LoadFromFile(std::ifstream& ifstream)
 	{
 		int tmpIndex, tmpGroupIndex;
 		std::string tmpName, tmpSecondName, tmpThirdName;
-		while (ifstream >> tmpIndex >> tmpSecondName >> tmpName >> tmpThirdName >> tmpGroupIndex)
+		Student tmp;
+		while (ifstream.read((char*)&tmp, sizeof(Student)))
 		{
-			_block.push_back(Student(tmpIndex, tmpName, tmpSecondName, tmpThirdName, tmpGroupIndex));
+			_block.push_back(Student(tmp));
 			if (this->_block.size() == 5 && nextBlock != nullptr)
 			{
 				nextBlock->LoadFromFile(ifstream);
