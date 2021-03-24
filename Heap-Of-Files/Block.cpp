@@ -55,7 +55,7 @@ void Block::AddStudent()
 		std::cout << "\nGroup index: ";
 		std::cin >> groupIndex;
 
-		_block.push_back(Student(index, name, secondName, thirdName, groupIndex));
+		_block.push_back(new Student(index, name, secondName, thirdName, groupIndex));
 		LoadInFile();
 	}
 }
@@ -129,9 +129,10 @@ void Block::DeleteStudent(int index)
 	{
 		for (size_t i = 0; i < _block.size(); i++)
 		{
-			if (_block[i].GetIndex() == index)
+			if (_block[i]->GetIndex() == index)
 			{
-				_block.erase(_block.begin()+i);
+				_block[i]->~Student();
+				_block[i] = this->FindLastStudent();
 				break;
 			}
 			else if (i == 4 && nextBlock != nullptr)
@@ -163,7 +164,7 @@ void Block::ShowBlock()
 	{
 		for (size_t i = 0; i < _block.size(); i++)
 		{
-			_block[i].GetInfo();
+			_block[i]->GetInfo();
 			if (i == 4 && nextBlock != nullptr)
 			{
 				nextBlock->ShowBlock();
@@ -179,7 +180,7 @@ void Block::LoadInFile()
 	{
 		for (auto student : _block)
 		{
-			outf << student;
+			outf << *student;
 			outf << " ";
 		}
 		//if(nextBlock != nullptr) nextBlock->LoadInFile(outf);
@@ -195,7 +196,8 @@ void Block::LoadInFile(std::ofstream& ofstream)
 	{
 		for (auto student : _block)
 		{
-			ofstream << student.GetIndex() << " " << student.GetSecondName() << " " << student.GetName() << " " << student.GetThirdName() << " " << student.GetGroupIndex() << std::endl;
+			ofstream << *student;
+			ofstream << " ";
 		}
 		if (nextBlock != nullptr)
 			nextBlock->LoadInFile(ofstream);
@@ -207,12 +209,10 @@ void Block::LoadFromFile()
 	std::ifstream ifs("Block.bin");
 	if (ifs)
 	{
-		int tmpIndex, tmpGroupIndex;
-		std::string tmpName, tmpSecondName, tmpThirdName;
 		while (!ifs.eof())
 		{
-			Student tmp;
-			ifs >> tmp;
+			Student* tmp = new Student();
+			ifs >> *tmp;
 			if (ifs.eof())
 			{
 				break;
@@ -238,12 +238,15 @@ void Block::LoadFromFile(std::ifstream& ifstream)
 {
 	if (ifstream)
 	{
-		int tmpIndex, tmpGroupIndex;
-		std::string tmpName, tmpSecondName, tmpThirdName;
-		Student tmp;
-		while (ifstream.read((char*)&tmp, sizeof(Student)))
+		while (!ifstream.eof())
 		{
-			_block.push_back(Student(tmp));
+			Student* tmp = new Student();
+			ifstream >> *tmp;
+			if (ifstream.eof())
+			{
+				break;
+			}
+			_block.push_back(tmp);
 			if (this->_block.size() == 5 && nextBlock != nullptr)
 			{
 				nextBlock->LoadFromFile(ifstream);
@@ -272,9 +275,9 @@ Student* Block::FindStudent(int index)
 	{
 		for (size_t i = 0; i < _block.size(); i++)
 		{
-			if (_block[i].GetIndex() == index)
+			if (_block[i]->GetIndex() == index)
 			{
-				return &_block[i];
+				return _block[i];
 			}
 			if (i == 4 && nextBlock != nullptr)
 			{
@@ -283,5 +286,22 @@ Student* Block::FindStudent(int index)
 		}
 	}
 	return nullptr;
+}
+
+Student* Block::FindLastStudent()
+{
+	if (_block.size() == 5 && nextBlock != nullptr)
+	{
+		return nextBlock->FindLastStudent();
+	}
+	else if (_block.size() <= 5 && nextBlock == nullptr)
+	{
+		if (_block[_block.size() - 1] == nullptr)
+		{
+			return nullptr;
+		}
+		return _block[_block.size() - 1];
+	}
+	else return nullptr;
 }
 

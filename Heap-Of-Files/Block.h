@@ -6,7 +6,7 @@
 class Block
 {
 private:
-	std::vector<Student> _block;
+	std::vector<Student*> _block;
 	Block* nextBlock;
 	static Block* EntryBlock;
 
@@ -24,4 +24,5 @@ public:
 	void LoadFromFile(std::ifstream& ifstream);
 	Student* CheckIndex(int index);
 	Student* FindStudent(int index);
+	Student* FindLastStudent();
 };
