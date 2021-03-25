@@ -131,8 +131,11 @@ void Block::DeleteStudent(int index)
 		{
 			if (_block[i]->GetIndex() == index)
 			{
+				Student** tmp = new Student*();
+				*tmp = EntryBlock->FindLastStudent();
 				_block[i]->~Student();
-				_block[i] = EntryBlock->FindLastStudent();
+				_block[i] = *tmp;
+				//EntryBlock->DeleteStudent((*tmp)->GetIndex());
 				break;
 			}
 			else if (i == 4 && nextBlock != nullptr)
@@ -207,15 +210,9 @@ void Block::LoadFromFile()
 	std::ifstream ifs("Block.bin");
 	if (ifs)
 	{
+		Student tmp;
 		while (!ifs.eof())
 		{
-			Student tmp;
-			ifs >> tmp;
-			if (ifs.eof())
-			{
-				break;
-			}
-			_block.push_back(new Student(tmp));
 			if (_block.size() == 5 && nextBlock != nullptr)
 			{
 				nextBlock->LoadFromFile(ifs);
@@ -223,10 +220,16 @@ void Block::LoadFromFile()
 			}
 			else if (_block.size() == 5 && nextBlock == nullptr)
 			{
-				nextBlock = new Block();
+				nextBlock = new Block(false);
 				nextBlock->LoadFromFile(ifs);
 				break;
 			}
+			if (ifs.eof())
+			{
+				break;
+			}
+			ifs >> tmp;
+			_block.push_back(new Student(tmp));
 		}
 	}
 	else std::cout << "Couldn't open file for writing!\n";
@@ -236,15 +239,9 @@ void Block::LoadFromFile(std::ifstream& ifstream)
 {
 	if (ifstream)
 	{
-		while (!ifstream.eof())
+		Student tmp;
+		while (ifstream >> tmp)
 		{
-			Student tmp;
-			ifstream >> tmp;
-			if (ifstream.eof())
-			{
-				break;
-			}
-			_block.push_back(new Student(tmp));
 			if (_block.size() == 5 && nextBlock != nullptr)
 			{
 				nextBlock->LoadFromFile(ifstream);
@@ -252,10 +249,16 @@ void Block::LoadFromFile(std::ifstream& ifstream)
 			}
 			else if (_block.size() == 5 && nextBlock == nullptr)
 			{
-				nextBlock = new Block();
+				nextBlock = new Block(false);
 				nextBlock->LoadFromFile(ifstream);
 				break;
 			}
+			if (ifstream.eof())
+			{
+				break;
+			}
+			//ifstream >> tmp;
+			_block.push_back(new Student(tmp));
 		}
 	}
 }

@@ -22,6 +22,7 @@ public:
 	void LoadInFile(std::ofstream& ofstream);
 	void LoadFromFile();
 	void LoadFromFile(std::ifstream& ifstream);
+
 	Student* CheckIndex(int index);
 	Student* FindStudent(int index);
 	Student* FindLastStudent();
