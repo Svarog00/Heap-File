@@ -3,10 +3,13 @@
 #include "Block.h"
 
 Block* Block::EntryBlock = nullptr;
+int Block::count = 0;
 
 Block::Block(bool init)
 {
 	nextBlock = nullptr;
+	num = count;
+	count++;
 	if (init)
 	{
 		LoadFromFile();
@@ -23,16 +26,16 @@ void Block::AddStudent()
 		else
 		{
 			nextBlock = new Block(false);
-			std::cout << "--------------------------Added new block\n";
+			std::cout << "--------------------------Added new block" << std::endl;
 			nextBlock->AddStudent();
 		}
 	}
 	else
 	{
 		int index;
-		std::string secondName;
-		std::string name;
-		std::string thirdName;
+		char secondName[64];
+		char name[64];
+		char thirdName[64];
 		int groupIndex;
 
 		//Enter data of a student
@@ -223,6 +226,7 @@ void Block::LoadFromFile()
 	if (ifs)
 	{
 		Student tmp;
+		ifs >> tmp;
 		while (!ifs.eof())
 		{
 			if (_block.size() == 5 && nextBlock != nullptr)
@@ -240,8 +244,8 @@ void Block::LoadFromFile()
 			{
 				break;
 			}
-			ifs >> tmp;
 			_block.push_back(new Student(tmp));
+			ifs >> tmp;
 		}
 	}
 	else std::cout << "Couldn't open file for writing!\n";
@@ -318,3 +322,25 @@ Student* Block::FindLastStudent()
 	else return nullptr;
 }
 
+std::ostream& operator<<(std::ostream& os, const Block& block)
+{
+	for (auto student : block._block)
+	{
+		os << *student;
+	}
+	return os;
+}
+
+std::istream& operator>>(std::istream& is, Block& block)
+{
+	Student tmp;
+	while(is >> tmp)
+	{
+		if (is.eof())
+		{
+			break;
+		}
+		block._block.push_back(new Student(tmp));
+	}
+	return is;
+}
