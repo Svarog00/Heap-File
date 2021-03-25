@@ -56,7 +56,7 @@ void Block::AddStudent()
 		std::cin >> groupIndex;
 
 		_block.push_back(new Student(index, name, secondName, thirdName, groupIndex));
-		LoadInFile();
+		EntryBlock->LoadInFile();
 	}
 }
 
@@ -84,7 +84,7 @@ void Block::ChangeStudent(int index)
 			std::cout << "New name: \n";
 			std::cin >> newName;
 			student->SetName(newName);
-			LoadInFile();
+			EntryBlock->LoadInFile();
 			break;
 		}
 		case 2:
@@ -93,7 +93,7 @@ void Block::ChangeStudent(int index)
 			std::cout << "New second name: \n";
 			std::cin >> newName;
 			student->SetSecondName(newName);
-			LoadInFile();
+			EntryBlock->LoadInFile();
 			break;
 		}
 		case 3:
@@ -102,7 +102,7 @@ void Block::ChangeStudent(int index)
 			std::cout << "New third name: \n";
 			std::cin >> newName;
 			student->SetThirdName(newName);
-			LoadInFile();
+			EntryBlock->LoadInFile();
 			break;
 		}
 		case 4:
@@ -111,7 +111,7 @@ void Block::ChangeStudent(int index)
 			std::cout << "New group index: \n";
 			std::cin >> newGroupIndex;
 			student->SetGroupIndex(newGroupIndex);
-			LoadInFile();
+			EntryBlock->LoadInFile();
 			break;
 		}
 		default:
@@ -132,7 +132,7 @@ void Block::DeleteStudent(int index)
 			if (_block[i]->GetIndex() == index)
 			{
 				_block[i]->~Student();
-				_block[i] = this->FindLastStudent();
+				_block[i] = EntryBlock->FindLastStudent();
 				break;
 			}
 			else if (i == 4 && nextBlock != nullptr)
@@ -144,7 +144,7 @@ void Block::DeleteStudent(int index)
 				std::cout << "There is no such student\n";
 			}
 		}
-		LoadInFile();
+		EntryBlock->LoadInFile();
 	}
 }
 
@@ -181,9 +181,8 @@ void Block::LoadInFile()
 		for (auto student : _block)
 		{
 			outf << *student;
-			outf << " ";
 		}
-		//if(nextBlock != nullptr) nextBlock->LoadInFile(outf);
+		if(nextBlock != nullptr) nextBlock->LoadInFile(outf);
 		std::cout << "Block has been loaded in file!\n";
 	}
 	else std::cout << "Couldn't open file for writing!\n";
@@ -197,7 +196,6 @@ void Block::LoadInFile(std::ofstream& ofstream)
 		for (auto student : _block)
 		{
 			ofstream << *student;
-			ofstream << " ";
 		}
 		if (nextBlock != nullptr)
 			nextBlock->LoadInFile(ofstream);
@@ -211,19 +209,19 @@ void Block::LoadFromFile()
 	{
 		while (!ifs.eof())
 		{
-			Student* tmp = new Student();
-			ifs >> *tmp;
+			Student tmp;
+			ifs >> tmp;
 			if (ifs.eof())
 			{
 				break;
 			}
-			_block.push_back(tmp);
-			if (this->_block.size() == 5 && nextBlock != nullptr)
+			_block.push_back(new Student(tmp));
+			if (_block.size() == 5 && nextBlock != nullptr)
 			{
 				nextBlock->LoadFromFile(ifs);
 				break;
 			}
-			else if (this->_block.size() == 5 && nextBlock == nullptr)
+			else if (_block.size() == 5 && nextBlock == nullptr)
 			{
 				nextBlock = new Block();
 				nextBlock->LoadFromFile(ifs);
@@ -240,19 +238,19 @@ void Block::LoadFromFile(std::ifstream& ifstream)
 	{
 		while (!ifstream.eof())
 		{
-			Student* tmp = new Student();
-			ifstream >> *tmp;
+			Student tmp;
+			ifstream >> tmp;
 			if (ifstream.eof())
 			{
 				break;
 			}
-			_block.push_back(tmp);
-			if (this->_block.size() == 5 && nextBlock != nullptr)
+			_block.push_back(new Student(tmp));
+			if (_block.size() == 5 && nextBlock != nullptr)
 			{
 				nextBlock->LoadFromFile(ifstream);
 				break;
 			}
-			else if (this->_block.size() == 5 && nextBlock == nullptr)
+			else if (_block.size() == 5 && nextBlock == nullptr)
 			{
 				nextBlock = new Block();
 				nextBlock->LoadFromFile(ifstream);
