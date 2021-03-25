@@ -16,6 +16,7 @@ public:
 	void AddStudent();
 	void ChangeStudent(int index);
 	void DeleteStudent(int index);
+	void DeleteLastElement();
 	void ShowStudent(int index);
 	void ShowBlock();
 	void LoadInFile();

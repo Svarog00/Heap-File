@@ -135,7 +135,7 @@ void Block::DeleteStudent(int index)
 				*tmp = EntryBlock->FindLastStudent();
 				_block[i]->~Student();
 				_block[i] = *tmp;
-				//EntryBlock->DeleteStudent((*tmp)->GetIndex());
+				EntryBlock->DeleteLastElement();
 				break;
 			}
 			else if (i == 4 && nextBlock != nullptr)
@@ -148,6 +148,18 @@ void Block::DeleteStudent(int index)
 			}
 		}
 		EntryBlock->LoadInFile();
+	}
+}
+
+void Block::DeleteLastElement()
+{
+	if (_block.size() == 5 && nextBlock != nullptr)
+	{
+		nextBlock->DeleteLastElement();
+	}
+	else if (_block.size() <= 5 && nextBlock == nullptr)
+	{
+		_block.erase(_block.begin() + _block.size() - 1);
 	}
 }
 
