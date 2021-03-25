@@ -9,6 +9,8 @@ private:
 	std::vector<Student*> _block;
 	Block* nextBlock;
 	static Block* EntryBlock;
+	static int count;
+	int num;
 
 public:
 	Block(bool init = true);
@@ -27,4 +29,7 @@ public:
 	Student* CheckIndex(int index);
 	Student* FindStudent(int index);
 	Student* FindLastStudent();
+
+	friend std::ostream& operator<<(std::ostream& os, const Block& block);
+	friend std::istream& operator>>(std::istream& is, Block& block);
 };
