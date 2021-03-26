@@ -22,6 +22,7 @@ public:
 	void SetThirdName(std::string newName);
 	void SetIndex(int newIndex);
 	void SetGroupIndex(int newIndex);
+	void Load();
 
 	int GetIndex();
 	int GetGroupIndex();

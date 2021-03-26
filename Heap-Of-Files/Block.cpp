@@ -3,16 +3,12 @@
 #include "Block.h"
 
 Block* Block::EntryBlock = nullptr;
-int Block::count = 0;
 
 Block::Block(bool init)
 {
 	nextBlock = nullptr;
-	num = count;
-	count++;
 	if (init)
 	{
-		LoadFromFile();
 		EntryBlock = this;
 	}
 }
@@ -57,9 +53,11 @@ void Block::AddStudent()
 		std::cin >> thirdName;
 		std::cout << "\nGroup index: ";
 		std::cin >> groupIndex;
+		tmp = new Student(index, name, secondName, thirdName, groupIndex);
+		tmp->Load();
 
-		_block.push_back(new Student(index, name, secondName, thirdName, groupIndex));
-		EntryBlock->LoadInFile();
+		//.push_back(new Student(index, name, secondName, thirdName, groupIndex));
+		//EntryBlock->LoadInFile();
 	}
 }
 
@@ -198,7 +196,7 @@ void Block::LoadInFile()
 	{
 		for (auto student : _block)
 		{
-			outf << *student;
+			outf.write((char*)student, sizeof(Student));
 		}
 		if(nextBlock != nullptr) nextBlock->LoadInFile(outf);
 		std::cout << "Block has been loaded in file!\n";
@@ -213,7 +211,7 @@ void Block::LoadInFile(std::ofstream& ofstream)
 	{
 		for (auto student : _block)
 		{
-			ofstream << *student;
+			ofstream.write((char*)student, sizeof(Student));
 		}
 		if (nextBlock != nullptr)
 			nextBlock->LoadInFile(ofstream);
@@ -226,7 +224,7 @@ void Block::LoadFromFile()
 	if (ifs)
 	{
 		Student tmp;
-		ifs >> tmp;
+		ifs.read((char*)&tmp, sizeof(Student));
 		while (!ifs.eof())
 		{
 			if (_block.size() == 5 && nextBlock != nullptr)
@@ -245,7 +243,7 @@ void Block::LoadFromFile()
 				break;
 			}
 			_block.push_back(new Student(tmp));
-			ifs >> tmp;
+			ifs.read((char*)&tmp, sizeof(Student));
 		}
 	}
 	else std::cout << "Couldn't open file for writing!\n";
@@ -256,7 +254,7 @@ void Block::LoadFromFile(std::ifstream& ifstream)
 	if (ifstream)
 	{
 		Student tmp;
-		while (ifstream >> tmp)
+		while (!ifstream.eof())
 		{
 			if (_block.size() == 5 && nextBlock != nullptr)
 			{
@@ -273,7 +271,7 @@ void Block::LoadFromFile(std::ifstream& ifstream)
 			{
 				break;
 			}
-			//ifstream >> tmp;
+			ifstream.read((char*)&tmp, sizeof(Student));
 			_block.push_back(new Student(tmp));
 		}
 	}
@@ -288,6 +286,7 @@ Student* Block::FindStudent(int index)
 {
 	//Find the student by index in the vector 
 	//Return pointer on the student
+	EntryBlock->LoadFromFile();
 	if (_block.size() > 0)
 	{
 		for (size_t i = 0; i < _block.size(); i++)
@@ -305,21 +304,30 @@ Student* Block::FindStudent(int index)
 	return nullptr;
 }
 
+//Student* Block::FindLastStudent()
+//{
+//	if (_block.size() == 5 && nextBlock != nullptr)
+//	{
+//		return nextBlock->FindLastStudent();
+//	}
+//	else if (_block.size() <= 5 && nextBlock == nullptr)
+//	{
+//		if (_block[_block.size() - 1] == nullptr)
+//		{
+//			return nullptr;
+//		}
+//		return _block[_block.size() - 1];
+//	}
+//	else return nullptr;
+//}
+
 Student* Block::FindLastStudent()
 {
-	if (_block.size() == 5 && nextBlock != nullptr)
-	{
-		return nextBlock->FindLastStudent();
-	}
-	else if (_block.size() <= 5 && nextBlock == nullptr)
-	{
-		if (_block[_block.size() - 1] == nullptr)
-		{
-			return nullptr;
-		}
-		return _block[_block.size() - 1];
-	}
-	else return nullptr;
+	std::ifstream ifs("Block.bin", std::ios::binary);
+	ifs.seekg(sizeof(Student), std::ios::end);
+	Student* tmp = new Student();
+	ifs.read((char*)tmp, sizeof(Student));
+	return tmp;
 }
 
 std::ostream& operator<<(std::ostream& os, const Block& block)
