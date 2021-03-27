@@ -4,12 +4,11 @@
 Student::Student()
 {
 	char tmp[] = "Undefined";
-	this->index = 0;
+	this->index = -1;
 	memcpy(nam, tmp, sizeof(tmp));
 	memcpy(secName, tmp, sizeof(tmp));
 	memcpy(thName, tmp, sizeof(tmp));
-	this->groupIndex = 0;
-	std::cout << "New student slot reserved\n";
+	this->groupIndex = -1;
 }
 
 Student::Student(int index, char name[], char secondName[], char thirdName[], int groupIndex)
