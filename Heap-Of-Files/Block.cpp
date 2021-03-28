@@ -5,6 +5,8 @@
 Block* Block::EntryBlock = nullptr;
 int Block::count = 0;
 
+//Менять: уделение студента, изменение информации о студенте
+
 Block::Block(bool init)
 {
 	nextBlock = nullptr;
@@ -131,20 +133,8 @@ void Block::DeleteStudent(int index)
 {
 	//Find the index of the student in the vector
 	//erase it from vector
-	Student* student;
-	student = EntryBlock->FindStudent(index);
-	if (student != nullptr)
-	{
-		Student** tmp = new Student * ();
-		*tmp = EntryBlock->FindLastStudent();
-		student->~Student();
-		student = *tmp;
-		EntryBlock->LoadInFile();
-		std::fstream file("Block.bin");
-		file.seekp(sizeof(Student), std::ios::end);
-		file.write("\0", sizeof("\0"));
-	}
-	/*if (_block.size() > 0)
+	LoadFromFile();
+	if (_block.size() > 0)
 	{
 		for (size_t i = 0; i < _block.size(); i++)
 		{
@@ -167,7 +157,7 @@ void Block::DeleteStudent(int index)
 			}
 		}
 		EntryBlock->LoadInFile();
-	}*/
+	}
 }
 
 void Block::DeleteLastElement()
