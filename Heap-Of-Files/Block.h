@@ -25,6 +25,7 @@ public:
 	void LoadInFile();
 	void LoadInFile(std::ofstream& ofstream);
 	void LoadFromFile(int shift = 0);
+	void Clear();
 
 	Student* CheckIndex(int index);
 	Student* FindStudent(int index, int shift = 0);

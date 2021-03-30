@@ -1,5 +1,7 @@
 #include <fstream>
 #include <iostream>
+#include <io.h>
+#include <fcntl.h>
 #include "Block.h"
 
 Block* Block::EntryBlock = nullptr;
@@ -127,6 +129,7 @@ void Block::ChangeStudent(int index)
 			break;
 		}
 	}
+	Clear();
 }
 
 void Block::DeleteStudent(int index)
@@ -144,7 +147,6 @@ void Block::DeleteStudent(int index)
 				*tmp = EntryBlock->FindLastStudent();
 				_block[i]->~Student();
 				_block[i] = *tmp;
-				EntryBlock->DeleteLastElement();
 				break;
 			}
 			else if (i == 4 && nextBlock != nullptr)
@@ -157,19 +159,16 @@ void Block::DeleteStudent(int index)
 			}
 		}
 		EntryBlock->LoadInFile();
+		EntryBlock->DeleteLastElement();
 	}
+	Clear();
 }
 
 void Block::DeleteLastElement()
 {
-	if (_block.size() == 5 && nextBlock != nullptr)
-	{
-		nextBlock->DeleteLastElement();
-	}
-	else if (_block.size() <= 5 && nextBlock == nullptr)
-	{
-		_block.erase(_block.begin() + _block.size() - 1);
-	}
+	int file;
+	_sopen_s(&file, "Block.bin", _O_RDWR, _SH_DENYNO, _S_IREAD | _S_IWRITE);
+	_chsize_s(file, _filelength(file)-sizeof(Student));
 }
 
 void Block::ShowStudent(int index)
@@ -180,6 +179,8 @@ void Block::ShowStudent(int index)
 		std::cout << "There is no such student\n";
 	else 
 		student->GetInfo();
+
+	Clear();
 }
 
 void Block::ShowBlock(int shift)
@@ -197,6 +198,7 @@ void Block::ShowBlock(int shift)
 			}
 		}
 	}
+	Clear();
 }
 
 void Block::LoadInFile()
@@ -249,6 +251,16 @@ void Block::LoadFromFile(int shift)
 	else std::cout << "Couldn't open file for writing!\n";
 }
 
+void Block::Clear()
+{
+	Block* ptr = EntryBlock;
+	while(ptr!= nullptr)
+	{
+		ptr->_block.clear();
+		ptr = ptr->nextBlock;
+	}
+}
+
 Student* Block::CheckIndex(int index)
 {
 	return EntryBlock->FindStudent(index);
@@ -279,27 +291,13 @@ Student* Block::FindStudent(int index, int shift)
 
 Student* Block::FindLastStudent()
 {
-	std::ifstream ifs("Block.bin");
+	std::ifstream ifs("Block.bin", std::ios::binary);
 	if (ifs.is_open())
 	{
 		Student tmp;
-		ifs.seekg(sizeof(Student), std::ios::end);
+		ifs.seekg(-200, std::ios::end);
 		ifs.read((char*)&tmp, sizeof(Student));
 		return &tmp;
 	}
 	else return nullptr;
-	/*if (_block.size() == 5 && nextBlock != nullptr)
-	{
-		return nextBlock->FindLastStudent();
-	}
-	else if (_block.size() <= 5 && nextBlock == nullptr)
-	{
-		if (_block[_block.size() - 1] == nullptr)
-		{
-			return nullptr;
-		}
-		return _block[_block.size() - 1];
-	}
-	else return nullptr;*/
-
 }
