@@ -70,7 +70,7 @@ void Block::AddStudent()
 	}
 }
 
-void Block::ChangeStudent(int index)
+void Block::ChangeStudent(int index, int shift)
 {
 	//Find the index of the student in the vector
 	//call setter
@@ -129,29 +129,30 @@ void Block::ChangeStudent(int index)
 			break;
 		}
 	}
-	Clear();
+	EntryBlock->Clear();
 }
 
-void Block::DeleteStudent(int index)
+void Block::DeleteStudent(int index, int shift)
 {
 	//Find the index of the student in the vector
 	//erase it from vector
-	LoadFromFile();
+	LoadFromFile(shift);
 	if (_block.size() > 0)
 	{
 		for (size_t i = 0; i < _block.size(); i++)
 		{
 			if (_block[i]->GetIndex() == index)
 			{
-				Student** tmp = new Student*();
-				*tmp = EntryBlock->FindLastStudent();
-				_block[i]->~Student();
-				_block[i] = *tmp;
+				Student* tmp;
+				tmp = new Student(*(EntryBlock->FindLastStudent()));
+				delete _block[i];
+				_block[i] = new Student(*tmp);
+				delete tmp;
 				break;
 			}
 			else if (i == 4 && nextBlock != nullptr)
 			{
-				nextBlock->DeleteStudent(index);
+				nextBlock->DeleteStudent(index, ++shift);
 			}
 			else if(i == 4 && nextBlock == nullptr)
 			{
@@ -161,7 +162,7 @@ void Block::DeleteStudent(int index)
 		EntryBlock->LoadInFile();
 		EntryBlock->DeleteLastElement();
 	}
-	Clear();
+	EntryBlock->Clear();
 }
 
 void Block::DeleteLastElement()
@@ -180,7 +181,7 @@ void Block::ShowStudent(int index)
 	else 
 		student->GetInfo();
 
-	Clear();
+	EntryBlock->Clear();
 }
 
 void Block::ShowBlock(int shift)
@@ -193,17 +194,18 @@ void Block::ShowBlock(int shift)
 			_block[i]->GetInfo();
 			if (i == 4 && nextBlock == nullptr)
 			{
-				nextBlock = new Block();
+				nextBlock = new Block(false);
 				nextBlock->ShowBlock(++shift);
 			}
 		}
 	}
-	Clear();
+	EntryBlock->Clear();
 }
 
 void Block::LoadInFile()
 {
-	std::ofstream outf("Block.bin", std::ios::binary);
+	std::ofstream outf("Block.bin", std::ios::binary | std::ios::ate);
+	outf.seekp(0);
 	if (outf)
 	{
 		for (auto student : _block)
@@ -281,7 +283,7 @@ Student* Block::FindStudent(int index, int shift)
 			}
 			if (i == 4)
 			{
-				nextBlock = new Block();
+				nextBlock = new Block(false);
 				return nextBlock->FindStudent(index, ++shift);
 			}
 		}

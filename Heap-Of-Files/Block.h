@@ -17,8 +17,8 @@ public:
 	Block(bool init = true);
 
 	void AddStudent();
-	void ChangeStudent(int index);
-	void DeleteStudent(int index);
+	void ChangeStudent(int index, int shift = 0);
+	void DeleteStudent(int index, int shift = 0);
 	void DeleteLastElement();
 	void ShowStudent(int index);
 	void ShowBlock(int shift = 0);
