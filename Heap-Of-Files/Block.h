@@ -12,6 +12,7 @@ private:
 	static int count;
 	int num;
 
+
 public:
 	Block(bool init = true);
 
