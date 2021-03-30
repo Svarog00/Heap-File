@@ -6,14 +6,15 @@ class Student
 {
 private:
 	int index;
-	std::string secondName;
-	std::string name;
-	std::string thirdName;
 	int groupIndex;
+
+	char secName[64];
+	char nam[64];
+	char thName[64];
 
 public:
 	Student();
-	Student(int index, std::string name, std::string secondName, std::string thirdName, int groupIndex);
+	Student(int index, char name[], char secondName[], char thirdName[], int groupIndex);
 
 	void GetInfo();
 	void SetName(std::string newName);
@@ -21,12 +22,14 @@ public:
 	void SetThirdName(std::string newName);
 	void SetIndex(int newIndex);
 	void SetGroupIndex(int newIndex);
+	void Load();
 
 	int GetIndex();
-	std::string GetSecondName();
-	std::string GetName();
-	std::string GetThirdName();
 	int GetGroupIndex();
+
+	char* GetSecName();
+	char* GetN();
+	char* GetThName();
 
 	friend std::ostream& operator<<(std::ostream& os, const Student& stud);
 	friend std::istream& operator>>(std::istream& is, Student& stud);

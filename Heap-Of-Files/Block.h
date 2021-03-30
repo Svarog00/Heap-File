@@ -10,6 +10,7 @@ private:
 	Block* nextBlock;
 	static Block* EntryBlock;
 
+
 public:
 	Block(bool init = true);
 
@@ -18,13 +19,12 @@ public:
 	void DeleteStudent(int index);
 	void DeleteLastElement();
 	void ShowStudent(int index);
-	void ShowBlock();
+	void ShowBlock(int shift = 0);
 	void LoadInFile();
 	void LoadInFile(std::ofstream& ofstream);
-	void LoadFromFile();
-	void LoadFromFile(std::ifstream& ifstream);
+	void LoadFromFile(int shift = 0);
 
 	Student* CheckIndex(int index);
-	Student* FindStudent(int index);
+	Student* FindStudent(int index, int shift = 0);
 	Student* FindLastStudent();
 };

@@ -1,22 +1,23 @@
 #include <iostream>
+#include <fstream>
 #include "StudentClass.h"
 
 Student::Student()
 {
-	this->index = 0;
-	this->name = "Undefined";
-	this->secondName = "Undefined";
-	this->thirdName = "Undefined";
-	this->groupIndex = 0;
-	std::cout << "New student slot reserved\n";
+	char tmp[] = "Undefined";
+	this->index = -1;
+	memcpy(nam, tmp, sizeof(tmp));
+	memcpy(secName, tmp, sizeof(tmp));
+	memcpy(thName, tmp, sizeof(tmp));
+	this->groupIndex = -1;
 }
 
-Student::Student(int index, std::string name, std::string secondName, std::string thirdName, int groupIndex)
+Student::Student(int index, char name[], char secondName[], char thirdName[], int groupIndex)
 {
 	this->index = index;
-	this->name = name;
-	this->secondName = secondName;
-	this->thirdName = thirdName;
+	memcpy(nam, name, 64);
+	memcpy(secName, secondName, 64);
+	memcpy(thName, thirdName, 64);
 	this->groupIndex = groupIndex;
 	std::cout << "New student added\n";
 }
@@ -24,26 +25,26 @@ Student::Student(int index, std::string name, std::string secondName, std::strin
 void Student::GetInfo()
 {
 	std::cout << "Index: " << this->index << std::endl
-		<< "Name: " << this->name << std::endl
-		<< "Second name: " << this->secondName << std::endl
-		<< "Patronymic: " << this->thirdName << std::endl
+		<< "Name: " << this->nam << std::endl
+		<< "Second name: " << this->secName << std::endl
+		<< "Patronymic: " << this->thName << std::endl
 		<< "Index of the group: " << this->groupIndex << std::endl;
 	std::cout << "\n==============================================\n";
 }
 //Setters
 void Student::SetName(std::string newName)
 {
-	this->name = newName;
+	memcpy(nam, newName.c_str(), sizeof(newName));
 }
 
 void Student::SetSecondName(std::string newName)
 {
-	this->secondName = newName;
+	memcpy(secName, newName.c_str(), sizeof(newName));
 }
 
 void Student::SetThirdName(std::string newName)
 {
-	this->thirdName = newName;
+	memcpy(thName, newName.c_str(), sizeof(newName));
 }
 
 void Student::SetIndex(int newIndex)
@@ -61,19 +62,19 @@ int Student::GetIndex()
 	return index;
 }
 
-std::string Student::GetSecondName()
+char* Student::GetSecName()
 {
-	return secondName;
+	return secName;
 }
 
-std::string Student::GetName()
+char* Student::GetThName()
 {
-	return name;
+	return thName;
 }
 
-std::string Student::GetThirdName()
+char* Student::GetN()
 {
-	return thirdName;
+	return nam;
 }
 
 int Student::GetGroupIndex()
@@ -81,14 +82,25 @@ int Student::GetGroupIndex()
 	return groupIndex;
 }
 
+void Student::Load()
+{
+	std::ofstream outf("Block.bin", std::ios::binary | std::ios::app);
+	if (outf)
+	{
+		outf.write((char*)this, sizeof(Student));
+	}
+	else std::cout << "Couldn't open file for writing!\n";
+	outf.close();
+}
+
 std::ostream& operator<<(std::ostream& os, const Student& stud)
 {
-	os << stud.index << ' ' << stud.secondName << ' ' << stud.name << ' ' << stud.thirdName << ' ' << stud.groupIndex << std::endl;
+	os << stud.index << ' ' << stud.secName << ' ' << stud.nam << ' ' << stud.thName << ' ' << stud.groupIndex << std::endl;
 	return os;
 }
 
 std::istream& operator>>(std::istream& is, Student& stud)
 {
-	is >> stud.index >> stud.secondName >> stud.name >> stud.thirdName >> stud.groupIndex;
+	is >> stud.index >> stud.secName >> stud.nam >> stud.thName >> stud.groupIndex;
 	return is;
 }
