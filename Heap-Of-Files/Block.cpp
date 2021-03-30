@@ -1,14 +1,22 @@
 #include <fstream>
 #include <iostream>
+#include <io.h>
+#include <fcntl.h>
 #include "Block.h"
 
 Block* Block::EntryBlock = nullptr;
+int Block::count = 0;
+
+//Менять: уделение студента, изменение информации о студенте
 
 Block::Block(bool init)
 {
 	nextBlock = nullptr;
+	num = count;
+	count++;
 	if (init)
 	{
+		//LoadFromFile();
 		EntryBlock = this;
 	}
 }
@@ -53,15 +61,16 @@ void Block::AddStudent()
 		std::cin >> thirdName;
 		std::cout << "\nGroup index: ";
 		std::cin >> groupIndex;
-		tmp = new Student(index, name, secondName, thirdName, groupIndex);
-		tmp->Load();
+		
+		std::ofstream outf("Block.bin", std::ios::binary | std::ios::app);
+		outf.write((char*)new Student(index, name, secondName, thirdName, groupIndex), sizeof(Student));
 
-		//.push_back(new Student(index, name, secondName, thirdName, groupIndex));
-		//EntryBlock->LoadInFile();
+		/*_block.push_back(new Student(index, name, secondName, thirdName, groupIndex));
+		EntryBlock->LoadInFile();*/
 	}
 }
 
-void Block::ChangeStudent(int index)
+void Block::ChangeStudent(int index, int shift)
 {
 	//Find the index of the student in the vector
 	//call setter
@@ -120,28 +129,30 @@ void Block::ChangeStudent(int index)
 			break;
 		}
 	}
+	EntryBlock->Clear();
 }
 
-void Block::DeleteStudent(int index)
+void Block::DeleteStudent(int index, int shift)
 {
 	//Find the index of the student in the vector
 	//erase it from vector
+	LoadFromFile(shift);
 	if (_block.size() > 0)
 	{
 		for (size_t i = 0; i < _block.size(); i++)
 		{
 			if (_block[i]->GetIndex() == index)
 			{
-				Student** tmp = new Student*();
-				*tmp = EntryBlock->FindLastStudent();
-				_block[i]->~Student();
-				_block[i] = *tmp;
-				EntryBlock->DeleteLastElement();
+				Student* tmp;
+				tmp = new Student(*(EntryBlock->FindLastStudent()));
+				delete _block[i];
+				_block[i] = new Student(*tmp);
+				delete tmp;
 				break;
 			}
 			else if (i == 4 && nextBlock != nullptr)
 			{
-				nextBlock->DeleteStudent(index);
+				nextBlock->DeleteStudent(index, ++shift);
 			}
 			else if(i == 4 && nextBlock == nullptr)
 			{
@@ -149,19 +160,16 @@ void Block::DeleteStudent(int index)
 			}
 		}
 		EntryBlock->LoadInFile();
+		EntryBlock->DeleteLastElement();
 	}
+	EntryBlock->Clear();
 }
 
 void Block::DeleteLastElement()
 {
-	if (_block.size() == 5 && nextBlock != nullptr)
-	{
-		nextBlock->DeleteLastElement();
-	}
-	else if (_block.size() <= 5 && nextBlock == nullptr)
-	{
-		_block.erase(_block.begin() + _block.size() - 1);
-	}
+	int file;
+	_sopen_s(&file, "Block.bin", _O_RDWR, _SH_DENYNO, _S_IREAD | _S_IWRITE);
+	_chsize_s(file, _filelength(file)-sizeof(Student));
 }
 
 void Block::ShowStudent(int index)
@@ -172,26 +180,32 @@ void Block::ShowStudent(int index)
 		std::cout << "There is no such student\n";
 	else 
 		student->GetInfo();
+
+	EntryBlock->Clear();
 }
 
-void Block::ShowBlock()
+void Block::ShowBlock(int shift)
 {
+	this->LoadFromFile(shift);
 	if (_block.size() > 0)
 	{
 		for (size_t i = 0; i < _block.size(); i++)
 		{
 			_block[i]->GetInfo();
-			if (i == 4 && nextBlock != nullptr)
+			if (i == 4 && nextBlock == nullptr)
 			{
-				nextBlock->ShowBlock();
+				nextBlock = new Block(false);
+				nextBlock->ShowBlock(++shift);
 			}
 		}
 	}
+	EntryBlock->Clear();
 }
 
 void Block::LoadInFile()
 {
-	std::ofstream outf("Block.bin", std::ios::binary);
+	std::ofstream outf("Block.bin", std::ios::binary | std::ios::ate);
+	outf.seekp(0);
 	if (outf)
 	{
 		for (auto student : _block)
@@ -218,62 +232,34 @@ void Block::LoadInFile(std::ofstream& ofstream)
 	}
 }
 
-void Block::LoadFromFile()
+void Block::LoadFromFile(int shift)
 {
 	std::ifstream ifs("Block.bin");
 	if (ifs)
 	{
 		Student tmp;
+		ifs.seekg(sizeof(Student)*shift*5);
 		ifs.read((char*)&tmp, sizeof(Student));
 		while (!ifs.eof())
 		{
-			if (_block.size() == 5 && nextBlock != nullptr)
-			{
-				nextBlock->LoadFromFile(ifs);
-				break;
-			}
-			else if (_block.size() == 5 && nextBlock == nullptr)
-			{
-				nextBlock = new Block(false);
-				nextBlock->LoadFromFile(ifs);
-				break;
-			}
-			if (ifs.eof())
-			{
-				break;
-			}
 			_block.push_back(new Student(tmp));
+			if (ifs.eof() || _block.size() == 5)
+			{
+				break;
+			}
 			ifs.read((char*)&tmp, sizeof(Student));
 		}
 	}
 	else std::cout << "Couldn't open file for writing!\n";
 }
 
-void Block::LoadFromFile(std::ifstream& ifstream)
+void Block::Clear()
 {
-	if (ifstream)
+	Block* ptr = EntryBlock;
+	while(ptr!= nullptr)
 	{
-		Student tmp;
-		while (!ifstream.eof())
-		{
-			if (_block.size() == 5 && nextBlock != nullptr)
-			{
-				nextBlock->LoadFromFile(ifstream);
-				break;
-			}
-			else if (_block.size() == 5 && nextBlock == nullptr)
-			{
-				nextBlock = new Block(false);
-				nextBlock->LoadFromFile(ifstream);
-				break;
-			}
-			if (ifstream.eof())
-			{
-				break;
-			}
-			ifstream.read((char*)&tmp, sizeof(Student));
-			_block.push_back(new Student(tmp));
-		}
+		ptr->_block.clear();
+		ptr = ptr->nextBlock;
 	}
 }
 
@@ -282,11 +268,11 @@ Student* Block::CheckIndex(int index)
 	return EntryBlock->FindStudent(index);
 }
 
-Student* Block::FindStudent(int index)
+Student* Block::FindStudent(int index, int shift)
 {
 	//Find the student by index in the vector 
 	//Return pointer on the student
-	EntryBlock->LoadFromFile();
+	this->LoadFromFile(shift);
 	if (_block.size() > 0)
 	{
 		for (size_t i = 0; i < _block.size(); i++)
@@ -295,60 +281,25 @@ Student* Block::FindStudent(int index)
 			{
 				return _block[i];
 			}
-			if (i == 4 && nextBlock != nullptr)
+			if (i == 4)
 			{
-				return nextBlock->FindStudent(index);
+				nextBlock = new Block(false);
+				return nextBlock->FindStudent(index, ++shift);
 			}
 		}
 	}
 	return nullptr;
 }
 
-//Student* Block::FindLastStudent()
-//{
-//	if (_block.size() == 5 && nextBlock != nullptr)
-//	{
-//		return nextBlock->FindLastStudent();
-//	}
-//	else if (_block.size() <= 5 && nextBlock == nullptr)
-//	{
-//		if (_block[_block.size() - 1] == nullptr)
-//		{
-//			return nullptr;
-//		}
-//		return _block[_block.size() - 1];
-//	}
-//	else return nullptr;
-//}
-
 Student* Block::FindLastStudent()
 {
 	std::ifstream ifs("Block.bin", std::ios::binary);
-	ifs.seekg(sizeof(Student), std::ios::end);
-	Student* tmp = new Student();
-	ifs.read((char*)tmp, sizeof(Student));
-	return tmp;
-}
-
-std::ostream& operator<<(std::ostream& os, const Block& block)
-{
-	for (auto student : block._block)
+	if (ifs.is_open())
 	{
-		os << *student;
+		Student tmp;
+		ifs.seekg(-200, std::ios::end);
+		ifs.read((char*)&tmp, sizeof(Student));
+		return &tmp;
 	}
-	return os;
-}
-
-std::istream& operator>>(std::istream& is, Block& block)
-{
-	Student tmp;
-	while(is >> tmp)
-	{
-		if (is.eof())
-		{
-			break;
-		}
-		block._block.push_back(new Student(tmp));
-	}
-	return is;
+	else return nullptr;
 }
