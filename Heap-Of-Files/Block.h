@@ -9,9 +9,6 @@ private:
 	std::vector<Student*> _block;
 	Block* nextBlock;
 	static Block* EntryBlock;
-	static int count;
-	int num;
-
 
 public:
 	Block(bool init = true);

@@ -5,15 +5,10 @@
 #include "Block.h"
 
 Block* Block::EntryBlock = nullptr;
-int Block::count = 0;
-
-//Менять: уделение студента, изменение информации о студенте
 
 Block::Block(bool init)
 {
 	nextBlock = nullptr;
-	num = count;
-	count++;
 	if (init)
 	{
 		//LoadFromFile();
@@ -23,51 +18,35 @@ Block::Block(bool init)
 
 void Block::AddStudent()
 {
-	if (_block.size() == 5)
-	{
-		if (nextBlock != nullptr)
-			nextBlock->AddStudent();
-		else
-		{
-			nextBlock = new Block(false);
-			std::cout << "--------------------------Added new block" << std::endl;
-			nextBlock->AddStudent();
-		}
-	}
-	else
-	{
-		int index;
-		char secondName[64];
-		char name[64];
-		char thirdName[64];
-		int groupIndex;
+	int index;
+	char secondName[64];
+	char name[64];
+	char thirdName[64];
+	int groupIndex;
 
-		//Enter data of a student
-		std::cout << "Index: ";
+	//Enter data of a student
+	std::cout << "Index: ";
+	std::cin >> index;
+	Student* tmp = CheckIndex(index);
+	while (tmp != nullptr)
+	{
+		std::cout << "This index is occupied. Enter another index.\n";
 		std::cin >> index;
-		Student* tmp = CheckIndex(index);
-		while (tmp != nullptr)
-		{
-			std::cout << "This index is occupied. Enter another index.\n";
-			std::cin >> index;
-			tmp = CheckIndex(index);
-		}
-
-		std::cout << "\nSecond name: ";
-		std::cin >> secondName;
-		std::cout << "\nName: ";
-		std::cin >> name;
-		std::cout << "\nThird name: ";
-		std::cin >> thirdName;
-		std::cout << "\nGroup index: ";
-		std::cin >> groupIndex;
-		
-		std::ofstream outf("Block.bin", std::ios::binary | std::ios::app);
-		outf.write((char*)new Student(index, name, secondName, thirdName, groupIndex), sizeof(Student));
-
-		/*_block.push_back(new Student(index, name, secondName, thirdName, groupIndex));
-		EntryBlock->LoadInFile();*/
+		tmp = CheckIndex(index);
 	}
+	EntryBlock->Clear();
+	delete tmp;
+	std::cout << "\nSecond name: ";
+	std::cin >> secondName;
+	std::cout << "\nName: ";
+	std::cin >> name;
+	std::cout << "\nThird name: ";
+	std::cin >> thirdName;
+	std::cout << "\nGroup index: ";
+	std::cin >> groupIndex;
+	
+	std::ofstream outf("Block.bin", std::ios::binary | std::ios::app);
+	outf.write((char*)new Student(index, name, secondName, thirdName, groupIndex), sizeof(Student));
 }
 
 void Block::ChangeStudent(int index, int shift)
@@ -129,6 +108,7 @@ void Block::ChangeStudent(int index, int shift)
 			break;
 		}
 	}
+	delete student;
 	EntryBlock->Clear();
 }
 
@@ -148,6 +128,8 @@ void Block::DeleteStudent(int index, int shift)
 				delete _block[i];
 				_block[i] = new Student(*tmp);
 				delete tmp;
+				EntryBlock->LoadInFile();
+				EntryBlock->DeleteLastElement();
 				break;
 			}
 			else if (i == 4 && nextBlock != nullptr)
@@ -159,8 +141,6 @@ void Block::DeleteStudent(int index, int shift)
 				std::cout << "There is no such student\n";
 			}
 		}
-		EntryBlock->LoadInFile();
-		EntryBlock->DeleteLastElement();
 	}
 	EntryBlock->Clear();
 }
@@ -192,7 +172,7 @@ void Block::ShowBlock(int shift)
 		for (size_t i = 0; i < _block.size(); i++)
 		{
 			_block[i]->GetInfo();
-			if (i == 4 && nextBlock == nullptr)
+			if (i == 4)
 			{
 				nextBlock = new Block(false);
 				nextBlock->ShowBlock(++shift);
@@ -256,10 +236,11 @@ void Block::LoadFromFile(int shift)
 void Block::Clear()
 {
 	Block* ptr = EntryBlock;
-	while(ptr!= nullptr)
+	while(ptr != nullptr)
 	{
 		ptr->_block.clear();
 		ptr = ptr->nextBlock;
+
 	}
 }
 
