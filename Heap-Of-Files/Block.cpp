@@ -232,7 +232,7 @@ void Block::LoadFromFile(int shift)
 		while (!ifs.eof())
 		{
 			_block.push_back(new Student(tmp));
-			if (ifs.eof() || _block.size() == 5 || _block.size() == num - shift * 5)
+			if (ifs.eof() || _block.size() == 5) //|| _block.size() == num - shift * 5
 			{
 				break;
 			}
