@@ -5,6 +5,7 @@
 #include "Block.h"
 
 Block* Block::EntryBlock = nullptr;
+int Block::num = 0;
 
 Block::Block(bool init)
 {
@@ -46,7 +47,14 @@ void Block::AddStudent()
 	std::cin >> groupIndex;
 	
 	std::ofstream outf("Block.bin", std::ios::binary | std::ios::app);
+	/*if (num % 5 == 0)
+	{
+		outf.seekp(sizeof(Student) * num);
+		outf.write("", sizeof(Student)*5);
+	}*/
+	outf.seekp(sizeof(Student)*num);
 	outf.write((char*)new Student(index, name, secondName, thirdName, groupIndex), sizeof(Student));
+	num++;
 }
 
 void Block::ChangeStudent(int index, int shift)
@@ -174,7 +182,8 @@ void Block::ShowBlock(int shift)
 			_block[i]->GetInfo();
 			if (i == 4)
 			{
-				nextBlock = new Block(false);
+				if(nextBlock == nullptr)
+					nextBlock = new Block(false);
 				nextBlock->ShowBlock(++shift);
 			}
 		}
@@ -223,7 +232,7 @@ void Block::LoadFromFile(int shift)
 		while (!ifs.eof())
 		{
 			_block.push_back(new Student(tmp));
-			if (ifs.eof() || _block.size() == 5)
+			if (ifs.eof() || _block.size() == 5 || _block.size() == num - shift * 5)
 			{
 				break;
 			}
