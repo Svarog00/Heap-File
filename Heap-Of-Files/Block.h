@@ -1,31 +1,37 @@
 #pragma once
-#include <vector>
 #include <fstream>
 #include "StudentClass.h"
+#include "FileManager.h"
+
+struct Container
+{
+	Student block[5];
+public:
+	Container();
+};
 
 class Block
 {
+public:
+	Container _block;
 private:
-	std::vector<Student*> _block;
-	Block* nextBlock;
 	static Block* EntryBlock;
+	FileManager fileManager;
 	static int num;
+	int shift;
 
 public:
 	Block(bool init = true);
 
 	void AddStudent();
-	void ChangeStudent(int index, int shift = 0);
-	void DeleteStudent(int index, int shift = 0);
+	void ChangeStudent(int index);
+	void DeleteStudent(int index);
 	void DeleteLastElement();
 	void ShowStudent(int index);
 	void ShowBlock(int shift = 0);
-	void LoadInFile();
-	void LoadInFile(std::ofstream& ofstream);
-	void LoadFromFile(int shift = 0);
-	void Clear();
+	void Exit();
 
 	Student* CheckIndex(int index);
-	Student* FindStudent(int index, int shift = 0);
+	Student* FindStudent(int index);
 	Student* FindLastStudent();
 };

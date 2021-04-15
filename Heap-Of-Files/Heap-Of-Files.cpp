@@ -20,7 +20,8 @@ int main()
     Block* blockEntry = new Block();
     char key;
     int tmpKey;
-    while (true)
+    bool work = true;
+    while (work)
     {
         ShowMenu();
         std::cin >> key;
@@ -45,7 +46,11 @@ int main()
             blockEntry->ShowStudent(tmpKey);
             break;
         case '5':
-            blockEntry->ShowBlock();
+            //blockEntry->ShowBlock();
+            break;
+        case '6':
+            work = false;
+            blockEntry->Exit();
             break;
         default:
             std::cout << "Wrong command!" << std::endl;
@@ -61,5 +66,6 @@ inline void ShowMenu()
         << "2 - Edit student" << std::endl
         << "3 - Delete student" << std::endl
         << "4 - Find student" << std::endl
-        << "5 - Show all of the students" << std::endl;
+        << "5 - Show all of the students" << std::endl
+        << "6 - Exit" << std::endl;
 }
