@@ -145,7 +145,6 @@ void Block::DeleteStudent(int index)
 {
 	//Find the index of the student in the vector
 	//erase it from vector
-	shift = 0;
 	fileManager.Reopen();
 	Student* tmp = FindStudent(index);
 	if (tmp != nullptr)
@@ -161,6 +160,8 @@ void Block::DeleteStudent(int index)
 				break;
 			}
 		}
+		fileManager.LoadInFile(&_block, shift, sizeof(Container));
+		fileManager.LoadInFile(&tmpBlock, num, sizeof(Container));
 	}
 	else std::cout << "There is no such student" << std::endl;
 	//Находим блок с нужным студентом, подгружаем последний блок. Обмениваем значения между нужным слотом в блоке и последним студентом. Обнуляем последнего студента

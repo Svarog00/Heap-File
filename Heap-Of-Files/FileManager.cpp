@@ -29,7 +29,7 @@ int FileManager::LoadLastFromFile(void* block, int size)
 		fs.close();
 		fs.open(path, std::ios::in | std::ios::out | std::ios::ate | std::ios::binary);
 		fs.seekg(0, std::ios::end);
-		num = fs.tellg() / size - 1;
+		num = fs.tellg() / size - 1; //Возвращаем количество блоков -1, так как счет блоков идет с 0
 		fs.seekg(size, std::ios::end);
 		fs.read((char*)&block, size);
 	}
