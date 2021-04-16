@@ -3,21 +3,23 @@
 
 FileManager::FileManager() {}
 
-FileManager::FileManager(std::string pat)
+FileManager::FileManager(std::string path)
 {
-	this->path = pat;
-	fs.open(path, std::ios::in | std::ios::out | std::ios::ate | std::ios::binary);
+	this->path = path;
+	fs.open(path, std::ios::binary);
+	fs.close();
+	fs.open(this->path, std::ios::in | std::ios::out | std::ios::ate | std::ios::binary);
 }
 
 void FileManager::LoadInFile(void* block, int shift, int size)
 {
-	fs.seekp(shift);
+	fs.seekp(shift, std::ios::beg);
 	fs.write((char*)block, size);
 }
 
 void FileManager::LoadFromFile(void* block, int shift, int size)
 {
-	fs.seekg(shift);
+	fs.seekg(shift, std::ios::beg);
 	fs.read((char*)block, size);
 }
 
@@ -31,15 +33,15 @@ int FileManager::LoadLastFromFile(void* block, int size)
 		fs.seekg(0, std::ios::end);
 		num = fs.tellg() / size - 1; //Возвращаем количество блоков -1, так как счет блоков идет с 0
 		fs.seekg(size, std::ios::end);
-		fs.read((char*)&block, size);
+		fs.read((char*)block, size);
 	}
 	return num;
 }
 
 void FileManager::LoadLastBlock(void* block, int size)
 {
-	fs.seekg(size, std::ios::end);
-	fs.read((char*)&block, size);
+	fs.seekg(-size, std::ios::end);
+	fs.read((char*)block, size);
 }
 
 void FileManager::Close()

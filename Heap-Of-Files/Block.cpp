@@ -75,7 +75,7 @@ void Block::AddStudent()
 			}
 		}
 	}
-
+	fileManager.Reopen();
 	fileManager.LoadInFile(&_block, num*sizeof(Container), sizeof(Container)); //Грузим блок в файл
 }
 
@@ -88,6 +88,7 @@ void Block::ChangeStudent(int index)
 		std::cout << "There is no such student\n";
 	else
 	{
+		fileManager.Reopen();
 		int key;
 		std::cout << "What you want to change?\n"
 			<< "1 - Name\n"
@@ -138,7 +139,6 @@ void Block::ChangeStudent(int index)
 			break;
 		}
 	}
-	delete student;
 }
 
 void Block::DeleteStudent(int index)
@@ -150,18 +150,20 @@ void Block::DeleteStudent(int index)
 	if (tmp != nullptr)
 	{
 		//Erase student 
+		fileManager.Reopen();
 		Container tmpBlock = Container();
 		fileManager.LoadLastBlock(&tmpBlock, sizeof(Container));
 		for (int i = 0; i < 5; i++)
 		{
-			if (_block.block[i].GetIndex() == -1)
+			if (tmpBlock.block[i].GetIndex() == -1)
 			{
 				*tmp = Student(tmpBlock.block[i - 1]);
+				tmpBlock.block[i - 1] = Student();
 				break;
 			}
 		}
-		fileManager.LoadInFile(&_block, shift, sizeof(Container));
-		fileManager.LoadInFile(&tmpBlock, num, sizeof(Container));
+		fileManager.LoadInFile(&_block, shift*sizeof(Container), sizeof(Container));
+		fileManager.LoadInFile(&tmpBlock, num*sizeof(Container), sizeof(Container));
 	}
 	else std::cout << "There is no such student" << std::endl;
 	//Находим блок с нужным студентом, подгружаем последний блок. Обмениваем значения между нужным слотом в блоке и последним студентом. Обнуляем последнего студента
