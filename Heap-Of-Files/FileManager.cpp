@@ -1,3 +1,5 @@
+#include <io.h>
+#include <fcntl.h>
 #include "FileManager.h"
 #include "Block.h"
 
@@ -57,6 +59,15 @@ void FileManager::Reopen()
 	if (fs.is_open())
 		fs.close();
 	fs.open(path, std::ios::in | std::ios::out | std::ios::ate | std::ios::binary);
+}
+
+void FileManager::DeleteLastBlock(int size)
+{
+	fs.close();
+	int file;
+	_sopen_s(&file, path.c_str(), _O_RDWR, _SH_DENYNO, _S_IREAD | _S_IWRITE);
+	_chsize_s(file, _filelength(file) - sizeof(Container));
+	fs.open(this->path, std::ios::in | std::ios::out | std::ios::ate | std::ios::binary);
 }
 
 int FileManager::GetEndOfFile()

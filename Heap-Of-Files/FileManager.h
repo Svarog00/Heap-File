@@ -16,6 +16,7 @@ public:
 	void LoadLastBlock(void* block, int size);
 	void Close();
 	void Reopen();
+	void DeleteLastBlock(int size);
 
 	int GetEndOfFile();
 	bool CheckBlock();

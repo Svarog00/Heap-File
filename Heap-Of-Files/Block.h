@@ -26,12 +26,10 @@ public:
 	void AddStudent();
 	void ChangeStudent(int index);
 	void DeleteStudent(int index);
-	void DeleteLastElement();
 	void ShowStudent(int index);
-	void ShowBlock(int shift = 0);
+	void ShowBlock();
 	void Exit();
 
 	Student* CheckIndex(int index);
 	Student* FindStudent(int index);
-	Student* FindLastStudent();
 };

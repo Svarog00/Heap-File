@@ -46,7 +46,7 @@ int main()
             blockEntry->ShowStudent(tmpKey);
             break;
         case '5':
-            //blockEntry->ShowBlock();
+            blockEntry->ShowBlock();
             break;
         case '6':
             work = false;
