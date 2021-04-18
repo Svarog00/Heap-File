@@ -178,7 +178,11 @@ void Block::DeleteStudent(int index)
 		{
 			fileManager.LoadInFile(tmpBlock, num * sizeof(Container), sizeof(Container));
 		}
-		else fileManager.DeleteLastBlock(sizeof(Container));
+		else
+		{
+			num--;
+			fileManager.DeleteLastBlock(sizeof(Container));
+		}
 	}
 	else std::cout << "There is no such student" << std::endl;
 	tmp = nullptr;
