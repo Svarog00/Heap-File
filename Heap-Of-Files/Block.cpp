@@ -143,16 +143,21 @@ void Block::ChangeStudent(int index)
 
 void Block::DeleteStudent(int index)
 {
+	bool sameBlock = false;
 	//Find the index of the student in the vector
 	//erase it from vector
 	fileManager.Reopen();
 	Student* tmp = FindStudent(index);
 	if (tmp != nullptr)
 	{
-		//Erase student 
 		fileManager.Reopen();
 		Container* tmpBlock = new Container();
 		fileManager.LoadLastBlock(tmpBlock, sizeof(Container));
+		if (_block.block[0].GetIndex() == tmpBlock->block[0].GetIndex())
+		{
+			sameBlock = true;
+			tmpBlock = &_block;
+		}
 		for (int i = 0; i < 5; i++)
 		{
 			if (tmpBlock->block[i].GetIndex() == -1)
@@ -169,9 +174,9 @@ void Block::DeleteStudent(int index)
 			}
 		}
 		fileManager.LoadInFile(&_block, shift*sizeof(Container), sizeof(Container));
-		if (tmpBlock->block[0].GetIndex() != -1)
+		if (tmpBlock->block[0].GetIndex() != -1 || !sameBlock)
 		{
-			fileManager.LoadInFile(&tmpBlock, num * sizeof(Container), sizeof(Container));
+			fileManager.LoadInFile(tmpBlock, num * sizeof(Container), sizeof(Container));
 		}
 		else fileManager.DeleteLastBlock(sizeof(Container));
 	}
