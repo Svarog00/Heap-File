@@ -174,11 +174,11 @@ void Block::DeleteStudent(int index)
 			}
 		}
 		fileManager.LoadInFile(&_block, shift*sizeof(Container), sizeof(Container));
-		if (tmpBlock->block[0].GetIndex() != -1 || !sameBlock)
+		if (!sameBlock)
 		{
 			fileManager.LoadInFile(tmpBlock, num * sizeof(Container), sizeof(Container));
 		}
-		else
+		else if(tmpBlock->block[0].GetIndex() == -1)
 		{
 			num--;
 			fileManager.DeleteLastBlock(sizeof(Container));
