@@ -81,26 +81,3 @@ int Student::GetGroupIndex()
 {
 	return groupIndex;
 }
-
-void Student::Load()
-{
-	std::ofstream outf("Block.bin", std::ios::binary | std::ios::app);
-	if (outf)
-	{
-		outf.write((char*)this, sizeof(Student));
-	}
-	else std::cout << "Couldn't open file for writing!\n";
-	outf.close();
-}
-
-std::ostream& operator<<(std::ostream& os, const Student& stud)
-{
-	os << stud.index << ' ' << stud.secName << ' ' << stud.nam << ' ' << stud.thName << ' ' << stud.groupIndex << std::endl;
-	return os;
-}
-
-std::istream& operator>>(std::istream& is, Student& stud)
-{
-	is >> stud.index >> stud.secName >> stud.nam >> stud.thName >> stud.groupIndex;
-	return is;
-}

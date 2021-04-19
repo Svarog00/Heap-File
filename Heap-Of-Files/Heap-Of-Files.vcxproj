@@ -140,11 +140,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Block.cpp" />
+    <ClCompile Include="FileManager.cpp" />
     <ClCompile Include="Heap-Of-Files.cpp" />
     <ClCompile Include="StudentClass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Block.h" />
+    <ClInclude Include="FileManager.h" />
     <ClInclude Include="StudentClass.h" />
   </ItemGroup>
   <ItemGroup>

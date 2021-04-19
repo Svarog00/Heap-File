@@ -1,20 +1,31 @@
 #include <fstream>
 #include <iostream>
-#include <io.h>
-#include <fcntl.h>
 #include "Block.h"
+#include "FileManager.h"
 
 Block* Block::EntryBlock = nullptr;
 int Block::num = 0;
 
+Container::Container()
+{
+	for (int i = 0; i < 5; i++)
+		block[i] = Student();
+}
+
 Block::Block(bool init)
 {
-	nextBlock = nullptr;
-	if (init)
+	shift = 0;
+	std::string tmp = "Block.bin";
+	fileManager = FileManager(tmp);
+	if (!fileManager.CheckBlock())
 	{
-		//LoadFromFile();
-		EntryBlock = this;
+		_block = Container();
 	}
+	else
+	{
+		num = fileManager.LoadLastFromFile(&_block, sizeof(Container)); //ѕолучаем кол-во блоков и загружаем последний.
+	}
+	EntryBlock = this;
 }
 
 void Block::AddStudent()
@@ -35,7 +46,6 @@ void Block::AddStudent()
 		std::cin >> index;
 		tmp = CheckIndex(index);
 	}
-	EntryBlock->Clear();
 	delete tmp;
 	std::cout << "\nSecond name: ";
 	std::cin >> secondName;
@@ -45,19 +55,29 @@ void Block::AddStudent()
 	std::cin >> thirdName;
 	std::cout << "\nGroup index: ";
 	std::cin >> groupIndex;
-	
-	std::ofstream outf("Block.bin", std::ios::binary | std::ios::app);
-	/*if (num % 5 == 0)
+
+	if (_block.block[4].GetIndex() != -1) //≈сли блок уже заполнен, то создаем новый и запихиваем в начало новую запись
 	{
-		outf.seekp(sizeof(Student) * num);
-		outf.write("", sizeof(Student)*5);
-	}*/
-	outf.seekp(sizeof(Student)*num);
-	outf.write((char*)new Student(index, name, secondName, thirdName, groupIndex), sizeof(Student));
-	num++;
+		_block = Container();
+		_block.block[0] = Student(index, name, secondName, thirdName, groupIndex);
+		num++;	
+	}
+	else //¬о всех остальных случа€ запихиваем на пустое место
+	{
+		for (int i = 0; i < 5; i++)
+		{
+			if (_block.block[i].GetIndex() == -1)
+			{
+				_block.block[i] = Student(index, name, secondName, thirdName, groupIndex);
+				break;
+			}
+		}
+	}
+	fileManager.Reopen();
+	fileManager.LoadInFile(&_block, num*sizeof(Container), sizeof(Container)); //√рузим блок в файл
 }
 
-void Block::ChangeStudent(int index, int shift)
+void Block::ChangeStudent(int index)
 {
 	//Find the index of the student in the vector
 	//call setter
@@ -66,6 +86,7 @@ void Block::ChangeStudent(int index, int shift)
 		std::cout << "There is no such student\n";
 	else
 	{
+		fileManager.Reopen();
 		int key;
 		std::cout << "What you want to change?\n"
 			<< "1 - Name\n"
@@ -81,7 +102,7 @@ void Block::ChangeStudent(int index, int shift)
 			std::cout << "New name: \n";
 			std::cin >> newName;
 			student->SetName(newName);
-			EntryBlock->LoadInFile();
+			fileManager.LoadInFile(&_block, shift * sizeof(Container), sizeof(Container));
 			break;
 		}
 		case 2:
@@ -90,7 +111,7 @@ void Block::ChangeStudent(int index, int shift)
 			std::cout << "New second name: \n";
 			std::cin >> newName;
 			student->SetSecondName(newName);
-			EntryBlock->LoadInFile();
+			fileManager.LoadInFile(&_block, shift * sizeof(Container), sizeof(Container));
 			break;
 		}
 		case 3:
@@ -99,7 +120,7 @@ void Block::ChangeStudent(int index, int shift)
 			std::cout << "New third name: \n";
 			std::cin >> newName;
 			student->SetThirdName(newName);
-			EntryBlock->LoadInFile();
+			fileManager.LoadInFile(&_block, shift * sizeof(Container), sizeof(Container));
 			break;
 		}
 		case 4:
@@ -108,7 +129,7 @@ void Block::ChangeStudent(int index, int shift)
 			std::cout << "New group index: \n";
 			std::cin >> newGroupIndex;
 			student->SetGroupIndex(newGroupIndex);
-			EntryBlock->LoadInFile();
+			fileManager.LoadInFile(&_block, shift * sizeof(Container), sizeof(Container));
 			break;
 		}
 		default:
@@ -116,48 +137,58 @@ void Block::ChangeStudent(int index, int shift)
 			break;
 		}
 	}
+	student = nullptr;
 	delete student;
-	EntryBlock->Clear();
 }
 
-void Block::DeleteStudent(int index, int shift)
+void Block::DeleteStudent(int index)
 {
+	bool sameBlock = false;
 	//Find the index of the student in the vector
 	//erase it from vector
-	LoadFromFile(shift);
-	if (_block.size() > 0)
+	fileManager.Reopen();
+	Student* tmp = FindStudent(index);
+	if (tmp != nullptr)
 	{
-		for (size_t i = 0; i < _block.size(); i++)
+		fileManager.Reopen();
+		Container* tmpBlock = new Container();
+		fileManager.LoadLastBlock(tmpBlock, sizeof(Container));
+		if (_block.block[0].GetIndex() == tmpBlock->block[0].GetIndex())
 		{
-			if (_block[i]->GetIndex() == index)
+			sameBlock = true;
+			tmpBlock = &_block;
+		}
+		for (int i = 0; i < 5; i++)
+		{
+			if (tmpBlock->block[i].GetIndex() == -1)
 			{
-				Student* tmp;
-				tmp = new Student(*(EntryBlock->FindLastStudent()));
-				delete _block[i];
-				_block[i] = new Student(*tmp);
-				delete tmp;
-				EntryBlock->LoadInFile();
-				EntryBlock->DeleteLastElement();
+				*tmp = Student(tmpBlock->block[i-1]);
+				tmpBlock->block[i-1] = Student();
 				break;
 			}
-			else if (i == 4 && nextBlock != nullptr)
+			else if (i == 4)
 			{
-				nextBlock->DeleteStudent(index, ++shift);
-			}
-			else if(i == 4 && nextBlock == nullptr)
-			{
-				std::cout << "There is no such student\n";
+				*tmp = Student(tmpBlock->block[i]);
+				tmpBlock->block[i] = Student();
+				break;
 			}
 		}
+		fileManager.LoadInFile(&_block, shift*sizeof(Container), sizeof(Container));
+		if (tmpBlock->block[0].GetIndex() != -1 || !sameBlock)
+		{
+			fileManager.LoadInFile(tmpBlock, num * sizeof(Container), sizeof(Container));
+		}
+		else
+		{
+			num--;
+			fileManager.DeleteLastBlock(sizeof(Container));
+		}
 	}
-	EntryBlock->Clear();
-}
-
-void Block::DeleteLastElement()
-{
-	int file;
-	_sopen_s(&file, "Block.bin", _O_RDWR, _SH_DENYNO, _S_IREAD | _S_IWRITE);
-	_chsize_s(file, _filelength(file)-sizeof(Student));
+	else std::cout << "There is no such student" << std::endl;
+	tmp = nullptr;
+	delete tmp;
+	//Ќаходим блок с нужным студентом, подгружаем последний блок. ќбмениваем значени€ между нужным слотом в блоке и последним студентом. ќбнул€ем последнего студента
+	
 }
 
 void Block::ShowStudent(int index)
@@ -168,89 +199,44 @@ void Block::ShowStudent(int index)
 		std::cout << "There is no such student\n";
 	else 
 		student->GetInfo();
-
-	EntryBlock->Clear();
 }
 
-void Block::ShowBlock(int shift)
+void Block::ShowBlock()
 {
-	this->LoadFromFile(shift);
-	if (_block.size() > 0)
+	shift = 0;
+	fileManager.Reopen();
+	fileManager.LoadFromFile(&_block, shift * sizeof(Container), sizeof(Container));
+	bool canWork = true;
+	while (shift <= num && canWork)
 	{
-		for (size_t i = 0; i < _block.size(); i++)
+		if (_block.block[0].GetIndex() != -1)
 		{
-			_block[i]->GetInfo();
-			if (i == 4)
+			for (size_t i = 0; i < 5; i++)
 			{
-				if(nextBlock == nullptr)
-					nextBlock = new Block(false);
-				nextBlock->ShowBlock(++shift);
+				if (_block.block[i].GetIndex() != -1)
+				{
+					_block.block[i].GetInfo();
+				}
+				else
+				{
+					canWork = false;
+					break;
+				}
+				if (i == 4)
+				{
+					shift++;
+				}
 			}
+			if (shift <= num) fileManager.LoadFromFile(&_block, shift * sizeof(Container), sizeof(Container));
+			else break;
 		}
-	}
-	EntryBlock->Clear();
-}
-
-void Block::LoadInFile()
-{
-	std::ofstream outf("Block.bin", std::ios::binary | std::ios::ate);
-	outf.seekp(0);
-	if (outf)
-	{
-		for (auto student : _block)
-		{
-			outf.write((char*)student, sizeof(Student));
-		}
-		if(nextBlock != nullptr) nextBlock->LoadInFile(outf);
-		std::cout << "Block has been loaded in file!\n";
-	}
-	else std::cout << "Couldn't open file for writing!\n";
-	outf.close();
-}
-
-void Block::LoadInFile(std::ofstream& ofstream)
-{
-	if (ofstream)
-	{
-		for (auto student : _block)
-		{
-			ofstream.write((char*)student, sizeof(Student));
-		}
-		if (nextBlock != nullptr)
-			nextBlock->LoadInFile(ofstream);
+		else break;
 	}
 }
 
-void Block::LoadFromFile(int shift)
+void Block::Exit()
 {
-	std::ifstream ifs("Block.bin");
-	if (ifs)
-	{
-		Student tmp;
-		ifs.seekg(sizeof(Student)*shift*5);
-		ifs.read((char*)&tmp, sizeof(Student));
-		while (!ifs.eof())
-		{
-			_block.push_back(new Student(tmp));
-			if (ifs.eof() || _block.size() == 5) //|| _block.size() == num - shift * 5
-			{
-				break;
-			}
-			ifs.read((char*)&tmp, sizeof(Student));
-		}
-	}
-	else std::cout << "Couldn't open file for writing!\n";
-}
-
-void Block::Clear()
-{
-	Block* ptr = EntryBlock;
-	while(ptr != nullptr)
-	{
-		ptr->_block.clear();
-		ptr = ptr->nextBlock;
-
-	}
+	fileManager.Close();
 }
 
 Student* Block::CheckIndex(int index)
@@ -258,38 +244,35 @@ Student* Block::CheckIndex(int index)
 	return EntryBlock->FindStudent(index);
 }
 
-Student* Block::FindStudent(int index, int shift)
+Student* Block::FindStudent(int index)
 {
 	//Find the student by index in the vector 
 	//Return pointer on the student
-	this->LoadFromFile(shift);
-	if (_block.size() > 0)
+	shift = 0;
+	fileManager.Reopen();
+	fileManager.LoadFromFile(&_block, shift * sizeof(Container), sizeof(Container));
+	//ѕока не достигнут конец файла, загружаем блок, провер€ем есть ли в блоке что-то, если в полученном блоке нет нужного студента - увеличиваем смещение и грузим следующий.
+	//shift * sizeof(Container) < fileManager.GetEndOfFile()
+	while (shift <= num)
 	{
-		for (size_t i = 0; i < _block.size(); i++)
+		if (_block.block[0].GetIndex() != -1)
 		{
-			if (_block[i]->GetIndex() == index)
+			for (size_t i = 0; i < 5; i++)
 			{
-				return _block[i];
+				if (_block.block[i].GetIndex() == index)
+				{
+					return &_block.block[i];
+				}
+				if (i == 4)
+				{
+					++shift;
+				}
 			}
-			if (i == 4)
-			{
-				nextBlock = new Block(false);
-				return nextBlock->FindStudent(index, ++shift);
-			}
+			if (shift * sizeof(Container) >= fileManager.GetEndOfFile())
+				break;
+			else fileManager.LoadFromFile(&_block, shift * sizeof(Container), sizeof(Container));
 		}
+		else break;
 	}
 	return nullptr;
-}
-
-Student* Block::FindLastStudent()
-{
-	std::ifstream ifs("Block.bin", std::ios::binary);
-	if (ifs.is_open())
-	{
-		Student tmp;
-		ifs.seekg(-200, std::ios::end);
-		ifs.read((char*)&tmp, sizeof(Student));
-		return &tmp;
-	}
-	else return nullptr;
 }
