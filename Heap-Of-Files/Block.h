@@ -28,6 +28,7 @@ public:
 	void DeleteStudent(int index);
 	void ShowStudent(int index);
 	void ShowBlock();
+	void Save();
 	void Exit();
 
 	Student* CheckIndex(int index);

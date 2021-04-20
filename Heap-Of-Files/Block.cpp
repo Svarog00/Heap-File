@@ -30,6 +30,12 @@ Block::Block(bool init)
 
 void Block::AddStudent()
 {
+	if (num == -1)
+	{
+		_block = Container();
+		num = 0;
+	}
+
 	int index;
 	char secondName[64];
 	char name[64];
@@ -55,7 +61,7 @@ void Block::AddStudent()
 	std::cin >> thirdName;
 	std::cout << "\nGroup index: ";
 	std::cin >> groupIndex;
-
+	
 	if (_block.block[4].GetIndex() != -1) //Если блок уже заполнен, то создаем новый и запихиваем в начало новую запись
 	{
 		_block = Container();
@@ -155,6 +161,7 @@ void Block::DeleteStudent(int index)
 		fileManager.LoadLastBlock(tmpBlock, sizeof(Container));
 		if (_block.block[0].GetIndex() == tmpBlock->block[0].GetIndex())
 		{
+			delete tmpBlock;
 			sameBlock = true;
 			tmpBlock = &_block;
 		}
@@ -174,15 +181,16 @@ void Block::DeleteStudent(int index)
 			}
 		}
 		fileManager.LoadInFile(&_block, shift*sizeof(Container), sizeof(Container));
-		if (!sameBlock)
-		{
-			fileManager.LoadInFile(tmpBlock, num * sizeof(Container), sizeof(Container));
-		}
-		else if(tmpBlock->block[0].GetIndex() == -1)
-		{
-			num--;
-			fileManager.DeleteLastBlock(sizeof(Container));
-		}
+		//if (!sameBlock && _block.block[0].GetIndex() != -1)
+		//{
+			if (tmpBlock->block[0].GetIndex() == -1)
+			{
+				num--;
+				fileManager.DeleteLastBlock(sizeof(Container));
+			}
+			else 
+				fileManager.LoadInFile(tmpBlock, num * sizeof(Container), sizeof(Container));
+		//}
 	}
 	else std::cout << "There is no such student" << std::endl;
 	tmp = nullptr;
@@ -236,6 +244,12 @@ void Block::ShowBlock()
 
 void Block::Exit()
 {
+	fileManager.Reopen();
+	fileManager.LoadLastBlock(&_block, sizeof(Container));
+	if (num == 0 && _block.block[0].GetIndex() == -1)
+	{
+		fileManager.DeleteLastBlock(sizeof(Container));
+	}
 	fileManager.Close();
 }
 
